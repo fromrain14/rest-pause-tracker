@@ -19,3 +19,4 @@ constexpr uint8_t NUM_LEDS = 21;
 constexpr uint32_t DEBOUNCE_DELAY_MS = 50;
 constexpr uint32_t LONG_PRESS_MS = 3000;
 constexpr uint32_t MIN_REST_TIME_MS = 120000; // 2 minutes
+constexpr uint32_t MAX_REST_TIME_MS = 240000; // 4 minutes
