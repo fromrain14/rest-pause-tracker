@@ -1,45 +1,38 @@
-#include <cstdint>
-#include "config.h"
 #include "Button.h"
-#include <Arduino.h>
 
-Button::Button(uint8_t pin, uint8_t mode) : pin(pin), mode(mode) {};
+Button::Button(uint8_t pin, uint8_t mode) : pin(pin), mode(mode) {}
 
 void Button::begin() {
     pinMode(pin, mode);
-};
+}
 
 ButtonEvent Button::update() {
     ButtonEvent event = ButtonEvent::NONE;
     uint32_t currentMillis = millis();
     bool buttonReading = digitalRead(pin);
 
-    if (buttonReading != lastButtonState) {
-        lastButtonState = buttonReading;
-        lastButtonPressTime = currentMillis;
+    if (buttonReading != rawButtonState) {
+        rawButtonState = buttonReading;
+        lastButtonStateTime = currentMillis;
     }
 
-    if (currentMillis - lastButtonPressTime > debounce_ms && lastButtonState != stableButtonState) {
-        stableButtonState = lastButtonState;
+    if (currentMillis - lastButtonStateTime > DEBOUNCE_DELAY_MS && rawButtonState != stableButtonState) {
+        stableButtonState = rawButtonState;
 
         if (stableButtonState == LOW) {
-            longButtonPressTime = currentMillis;         
+            buttonPressTimeStart = currentMillis;         
         }
-        else if (longPress == true) {
-            longPress = false;
-            buttonEvent = ButtonEvent::NONE;
+        else if (wasLongPress == true) {
+            wasLongPress = false;
         }
         else {
-            buttonEvent = ButtonEvent::SHORT_PRESS;
+            event = ButtonEvent::SHORT_PRESS;
         }
     }
-    else {
-        buttonEvent = ButtonEvent::NONE;
-    }
 
-    if (stableButtonState == LOW && currentMillis - longButtonPressTime > LONG_PRESS_MS && !longPress) {
-        longPress = true;
-        buttonEvent = ButtonEvent::LONG_PRESS;
+    if (stableButtonState == LOW && currentMillis - buttonPressTimeStart > LONG_PRESS_MS && !wasLongPress) {
+        wasLongPress = true;
+        event = ButtonEvent::LONG_PRESS;
     }
-    return buttonEvent;
+    return event;
 }
