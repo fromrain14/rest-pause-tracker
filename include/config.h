@@ -4,6 +4,7 @@
 //Display
 constexpr uint8_t SCREEN_WIDTH = 128;
 constexpr uint8_t SCREEN_HEIGHT = 64;
+constexpr uint8_t SCREEN_I2C_ADDRESS = 0x3C;
 
 //Pin
 constexpr uint8_t LED_PIN = 1;

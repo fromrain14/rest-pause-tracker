@@ -5,11 +5,14 @@
 #include <FastLED.h>
 #include "Button.h"
 #include "StateMachine.h"
+#include "DisplayUI.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
 
 StateMachine fsm;
+
+DisplayUI displayUI;
 
 // Dočasná simulace tepu (než bude BLE): tep je "ready" po této době od začátku pauzy.
 // < min. pauza → RED → ORANGE (tep) → READY, > min. pauza → RED → ORANGE (čas) → READY
@@ -20,9 +23,12 @@ void setup() {
     btnB.begin();
     Serial.begin(115200);
     Wire.begin(SDA_PIN, SCL_PIN);
+    if (!displayUI.begin()) {
+        Serial.println("Display initialization failed");
+    }
 }
 
-void loop() {
+void loop() {   
     uint32_t now = millis();
     State currentState = fsm.getState();
     ButtonEvent btnAEvent = btnA.update();
@@ -38,8 +44,10 @@ void loop() {
         Serial.println((int)btnBEvent);
     }
 
+    
     bool hrReady = fsm.getRestElapsedMs(now) >= FAKE_HR_READY_MS;
     fsm.update(btnAEvent, btnBEvent, hrReady, now); 
+    displayUI.draw(fsm, now);
     if (currentState != fsm.getState()) {
         Serial.print("State changed to: ");
         Serial.println(fsm.printState(fsm.getState()));
