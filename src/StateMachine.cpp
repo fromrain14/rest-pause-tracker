@@ -82,7 +82,7 @@ void StateMachine::update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t n
             break;
     }
 }
-char* StateMachine::printState(State s) const {
+const char* StateMachine::printState(State s) const {
     switch (s) {
         case State::SETUP:
             return "SETUP";
