@@ -23,6 +23,7 @@ public:
     uint8_t getSetCount() const;
     uint32_t getWorkoutDurationMs() const;
     uint32_t getAvgRestMs() const;
+    char* printState(State s) const;
 
 private:
     State state = State::SETUP;

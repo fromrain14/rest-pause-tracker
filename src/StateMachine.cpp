@@ -82,7 +82,22 @@ void StateMachine::update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t n
             break;
     }
 }
-
+char* StateMachine::printState(State s) const {
+    switch (s) {
+        case State::SETUP:
+            return "SETUP";
+        case State::READY:
+            return "READY";
+        case State::REST_RED:
+            return "REST_RED";
+        case State::REST_ORANGE:
+            return "REST_ORANGE";
+        case State::SUMMARY:
+            return "SUMMARY";
+        default:
+            return "UNKNOWN";
+    }
+}
 State StateMachine::getState() const {
     return state;
 }

@@ -4,9 +4,16 @@
 #include <Adafruit_SH110X.h>
 #include <FastLED.h>
 #include "Button.h"
+#include "StateMachine.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
+
+StateMachine fsm;
+
+// Dočasná simulace tepu (než bude BLE): tep je "ready" po této době od začátku pauzy.
+// < min. pauza → RED → ORANGE (tep) → READY, > min. pauza → RED → ORANGE (čas) → READY
+constexpr uint32_t FAKE_HR_READY_MS = 30000;
 
 void setup() {
     btnA.begin();
@@ -16,9 +23,12 @@ void setup() {
 }
 
 void loop() {
+    uint32_t now = millis();
+    State currentState = fsm.getState();
     ButtonEvent btnAEvent = btnA.update();
     ButtonEvent btnBEvent = btnB.update();
-    if (btnAEvent != ButtonEvent::NONE) { // nebo 0 / podle definice v Button.h
+
+    if (btnAEvent != ButtonEvent::NONE) {
         Serial.print("Btn A Event: ");
         Serial.println((int)btnAEvent);
     }
@@ -27,6 +37,12 @@ void loop() {
         Serial.print("Btn B Event: ");
         Serial.println((int)btnBEvent);
     }
-    
- 
+
+    bool hrReady = fsm.getRestElapsedMs(now) >= FAKE_HR_READY_MS;
+    fsm.update(btnAEvent, btnBEvent, hrReady, now); 
+    if (currentState != fsm.getState()) {
+        Serial.print("State changed to: ");
+        Serial.println(fsm.printState(fsm.getState()));
+        
+    }
 }   
