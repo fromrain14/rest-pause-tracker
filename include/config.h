@@ -15,6 +15,7 @@ constexpr uint8_t SCL_PIN = 7;
 
 //LEDS
 constexpr uint8_t NUM_LEDS = 1;   // jedna 5mm LED s čipem WS2811
+constexpr uint8_t LED_BRIGHTNESS = 64; // 0–255, 5mm LED na plný jas oslňuje
 
 //Buttons
 constexpr uint32_t DEBOUNCE_DELAY_MS = 50;
