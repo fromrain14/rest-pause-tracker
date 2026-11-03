@@ -8,6 +8,7 @@
 #include "DisplayUI.h"
 #include "LedController.h"
 #include "BleHeartRate.h"
+#include "HrBuffer.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
@@ -19,6 +20,8 @@ DisplayUI displayUI;
 LedController ledController;
 
 BleHeartRate ble;
+
+HrBuffer hrBuffer;
 
 // Dočasná simulace tepu (než bude BLE): tep je "ready" po této době od začátku pauzy.
 // < min. pauza → RED → ORANGE (tep) → READY, > min. pauza → RED → ORANGE (čas) → READY
@@ -66,15 +69,17 @@ void loop() {
     }
 
     ble.update();
-    // Dočasný ladicí výpis tepu 1× za sekundu
-    static uint32_t lastHrPrintMs = 0;
-    if (now - lastHrPrintMs >= 1000) {
-        lastHrPrintMs = now;
+    // Vzorek tepu do bufferu 1× za sekundu (0 = bez dat, aby seděla časová osa) + ladicí výpis
+    static uint32_t lastHrSampleMs = 0;
+    if (now - lastHrSampleMs >= 1000) {
+        lastHrSampleMs = now;
         uint16_t heartRate;
         if (ble.getHeartRate(heartRate)) {
+            hrBuffer.push(heartRate);
             Serial.print("HR: ");
             Serial.println(heartRate);
         } else {
+            hrBuffer.push(0);
             Serial.println("HR: --");
         }
     }
