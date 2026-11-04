@@ -9,6 +9,7 @@
 #include "LedController.h"
 #include "BleHeartRate.h"
 #include "HrBuffer.h"
+#include "RecoveryAlgorithm.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
@@ -23,9 +24,7 @@ BleHeartRate ble;
 
 HrBuffer hrBuffer;
 
-// Dočasná simulace tepu (než bude BLE): tep je "ready" po této době od začátku pauzy.
-// < min. pauza → RED → ORANGE (tep) → READY, > min. pauza → RED → ORANGE (čas) → READY
-constexpr uint32_t FAKE_HR_READY_MS = 30000;
+RecoveryAlgorithm recovery;
 
 void setup() {
     btnA.begin();
@@ -58,14 +57,19 @@ void loop() {
     }
 
     
-    bool hrReady = fsm.getRestElapsedMs(now) >= FAKE_HR_READY_MS;
-    fsm.update(btnAEvent, btnBEvent, hrReady, now); 
+    // Výsledek algoritmu, počítá se 1× za sekundu po novém vzorku (viz níže)
+    static bool hrReady = false;
+    fsm.update(btnAEvent, btnBEvent, hrReady, now);
     displayUI.draw(fsm, now);
     ledController.updateLEDs(fsm);
     if (currentState != fsm.getState()) {
         Serial.print("State changed to: ");
         Serial.println(fsm.printState(fsm.getState()));
-        
+        // Vstup do pauzy (jen z READY po stisku A) → algoritmus počítá od nuly
+        if (fsm.getState() == State::REST_RED) {
+            recovery.startRest();
+            hrReady = false;
+        }
     }
 
     ble.update();
@@ -82,6 +86,8 @@ void loop() {
             hrBuffer.push(0);
             Serial.println("HR: --");
         }
+        recovery.onSample();
+        hrReady = recovery.isHrReady(hrBuffer);
     }
 
 }   
