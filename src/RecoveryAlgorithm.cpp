@@ -173,3 +173,29 @@ bool RecoveryAlgorithm::recentSlope(const HrBuffer& hrBuffer, float& slope) cons
     }
     return true;
 }
+
+bool RecoveryAlgorithm::isHrReady(const HrBuffer& hrBuffer) const {
+    uint16_t peakHr, peakIndex;
+    float bestC, bestA, bestTau, p, slope;
+    uint16_t lastHr;
+    if (!hrBuffer.get(hrBuffer.size() - 1, lastHr)) {
+        return false; // Failed to get the last heart rate sample
+    }
+    if(!(findPeak(hrBuffer, peakHr, peakIndex))) {
+        return false;
+    }
+    if(!isPeakConfirmed(hrBuffer, peakHr)) {
+        return false;
+    }
+    if(findBestC(hrBuffer, peakIndex, bestC, bestA, bestTau)) {
+        p =(peakHr - lastHr)/(peakHr - bestC);
+        if (p >= HR_READY_RATIO) {
+            return true; // Ready by exponential fit
+        }
+    }
+    // Fit failed or p too low -> fallback: plateau by slope
+    if(!recentSlope(hrBuffer, slope)) {
+        return false;
+    }
+    return fabsf(slope) < HR_PLATEAU_SLOPE;
+}

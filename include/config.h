@@ -35,3 +35,5 @@ constexpr uint8_t HR_PEAK_HOLD_SAMPLES = 5;
 constexpr uint8_t HR_C_SEARCH_RANGE = 40;
 constexpr uint8_t HR_SLOPE_WINDOW_SAMPLES = 20;
 constexpr uint8_t HR_PEAK_LOOKBACK_SAMPLES = 60;
+constexpr float HR_READY_RATIO = 0.90f;
+constexpr float HR_PLATEAU_SLOPE = 0.05f;
