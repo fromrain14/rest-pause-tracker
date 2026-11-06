@@ -72,6 +72,12 @@ void loop() {
         }
     }
 
+    // Dlouhé B v SETUP → zapomenout uložený pás (FSM na dlouhé B v SETUP nereaguje)
+    if (currentState == State::SETUP && btnBEvent == ButtonEvent::LONG_PRESS) {
+        ble.removeSavedAddress();
+        Serial.println("Saved strap address removed");
+    }
+
     ble.update();
     // Vzorek tepu do bufferu 1× za sekundu (0 = bez dat, aby seděla časová osa) + ladicí výpis
     static uint32_t lastHrSampleMs = 0;

@@ -44,9 +44,8 @@ bool BleHeartRate::begin() {
     }
     return true;
 }
-void BleHeartRate::onResult(const NimBLEAdvertisedDevice* advertisedDevice) {
-   
-     if (advertisedDevice->isAdvertisingService(NimBLEUUID((uint16_t)0x180D))) {
+void BleHeartRate::onResult(const NimBLEAdvertisedDevice* advertisedDevice) { 
+     if (advertisedDevice->isAdvertisingService(NimBLEUUID((uint16_t)0x180D)) && (savedAddress.isNull() || advertisedDevice->getAddress() == savedAddress)) {
         foundAdress = advertisedDevice->getAddress();
         doConnect = true;
       //  Serial.println(advertisedDevice->getName().c_str());

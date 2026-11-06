@@ -28,6 +28,12 @@ class BleHeartRate : public NimBLEScanCallbacks, public NimBLEClientCallbacks {
         bool begin();
         bool getHeartRate(uint16_t& hr) const;
         bool isConnected() const;
+
+        void removeSavedAddress() {
+            preferences.remove("address");
+            preferences.remove("type");
+            savedAddress = NimBLEAddress();
+        }
 };
     
 
