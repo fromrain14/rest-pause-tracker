@@ -10,6 +10,7 @@
 #include "BleHeartRate.h"
 #include "HrBuffer.h"
 #include "RecoveryAlgorithm.h"
+#include "SerialSimulator.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
@@ -25,6 +26,8 @@ BleHeartRate ble;
 HrBuffer hrBuffer;
 
 RecoveryAlgorithm recovery;
+
+SerialSimulator sim;
 
 void setup() {
     btnA.begin();
@@ -45,6 +48,16 @@ void loop() {
     State currentState = fsm.getState();
     ButtonEvent btnAEvent = btnA.update();
     ButtonEvent btnBEvent = btnB.update();
+    // Simulace: příkaz ze Serialu přebije fyzické tlačítko (fyzická tlačítka fungují dál)
+    if (SIMULATION) {
+        sim.update();
+        if (sim.getButtonA() != ButtonEvent::NONE) {
+            btnAEvent = sim.getButtonA();
+        }
+        if (sim.getButtonB() != ButtonEvent::NONE) {
+            btnBEvent = sim.getButtonB();
+        }
+    }
 
     if (btnAEvent != ButtonEvent::NONE) {
         Serial.print("Btn A Event: ");
@@ -84,7 +97,8 @@ void loop() {
     if (now - lastHrSampleMs >= 1000) {
         lastHrSampleMs = now;
         uint16_t heartRate;
-        if (ble.getHeartRate(heartRate)) {
+        bool hasHeartRate = SIMULATION ? sim.getHeartRate(heartRate) : ble.getHeartRate(heartRate);
+        if (hasHeartRate) {
             hrBuffer.push(heartRate);
             Serial.print("HR: ");
             Serial.println(heartRate);

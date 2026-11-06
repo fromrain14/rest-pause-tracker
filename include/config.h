@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstddef>
 
 //Display
 constexpr uint8_t SCREEN_WIDTH = 128;
@@ -37,3 +38,7 @@ constexpr uint8_t HR_SLOPE_WINDOW_SAMPLES = 20;
 constexpr uint8_t HR_PEAK_LOOKBACK_SAMPLES = 60;
 constexpr float HR_READY_RATIO = 0.90f;
 constexpr float HR_PLATEAU_SLOPE = 0.05f;
+
+//Serial Simulator
+constexpr bool SIMULATION = true; // true = tep a tlacitka i ze Serial Monitoru (HR,140 / BTN,A / BTN,B_LONG)
+constexpr size_t SIM_LINE_SIZE = 32; // max. delka prikazu vcetne '\0' (napr. "BTN,B_LONG")
