@@ -25,6 +25,14 @@ bool BleHeartRate::isValid(const uint8_t* data, size_t length,  uint16_t& hrValu
     }
 }
 bool BleHeartRate::begin() {
+    if (!preferences.begin("bleHeartRate")) {
+        return false;
+    }
+    uint64_t adrr = preferences.getULong64("address");
+    uint8_t type = preferences.getUChar("type");
+    if(adrr) {
+        savedAddress = NimBLEAddress(adrr, type);
+    }
     if (!NimBLEDevice::init("")) {
         return false;
     }
@@ -37,6 +45,7 @@ bool BleHeartRate::begin() {
     return true;
 }
 void BleHeartRate::onResult(const NimBLEAdvertisedDevice* advertisedDevice) {
+   
      if (advertisedDevice->isAdvertisingService(NimBLEUUID((uint16_t)0x180D))) {
         foundAdress = advertisedDevice->getAddress();
         doConnect = true;
@@ -90,6 +99,11 @@ bool BleHeartRate::connectToStrap() {
     else{
          return false;}
     BleHeartRate::connected=true;
+    if (savedAddress.isNull()) {
+        preferences.putULong64("address", foundAdress);
+        preferences.putUChar("type", foundAdress.getType());
+        savedAddress = foundAdress;
+    }
     return true;
 }
 bool BleHeartRate::getHeartRate(uint16_t& hr) const {

@@ -4,6 +4,7 @@
 #include "config.h"
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <Preferences.h>
 
 class BleHeartRate : public NimBLEScanCallbacks, public NimBLEClientCallbacks {
     private:
@@ -14,7 +15,8 @@ class BleHeartRate : public NimBLEScanCallbacks, public NimBLEClientCallbacks {
         bool doConnect = false;
         NimBLEClient* client = nullptr;
         bool connectToStrap();
-
+        Preferences preferences;
+        NimBLEAddress savedAddress;
 
     public:
         void update();
