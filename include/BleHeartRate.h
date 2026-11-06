@@ -17,6 +17,8 @@ class BleHeartRate : public NimBLEScanCallbacks, public NimBLEClientCallbacks {
         bool connectToStrap();
         Preferences preferences;
         NimBLEAddress savedAddress;
+        // Zámek pro lastHeartRate + lastHeartRateUpdateTime (zapisuje NimBLE task, čte loop())
+        mutable portMUX_TYPE hrMux = portMUX_INITIALIZER_UNLOCKED;
 
     public:
         void update();

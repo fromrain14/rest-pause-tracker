@@ -86,8 +86,10 @@ bool BleHeartRate::connectToStrap() {
             [this](NimBLERemoteCharacteristic* c, uint8_t* data, size_t length, bool isNotify) {
                 uint16_t hr;
                 if (isValid(data, length, hr)) {
+                    portENTER_CRITICAL(&hrMux);
                     lastHeartRate = hr;
                     lastHeartRateUpdateTime = millis();
+                    portEXIT_CRITICAL(&hrMux);
                 }
             });
         if (!subscribed) {
@@ -106,8 +108,11 @@ bool BleHeartRate::connectToStrap() {
     return true;
 }
 bool BleHeartRate::getHeartRate(uint16_t& hr) const {
+    portENTER_CRITICAL(&hrMux);
     hr = lastHeartRate;
-    if(!hr || (millis()-lastHeartRateUpdateTime)>HR_MAX_AGE_MS) {
+    uint32_t updateTime = lastHeartRateUpdateTime;
+    portEXIT_CRITICAL(&hrMux);
+    if(!hr || (millis()-updateTime)>HR_MAX_AGE_MS) {
         return false;
     }
     else
