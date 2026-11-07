@@ -12,6 +12,7 @@ class SerialSimulator {
         uint16_t simulatedHr = 0;
         ButtonEvent simulatedBtnA = ButtonEvent::NONE;
         ButtonEvent simulatedBtnB = ButtonEvent::NONE;
+        bool dumpRequested = false; // příkaz DUMP (platí jen v průchodu, kdy přišel)
         //Soukromá metoda na zpracování hotového řádku.
         bool processLine(const char* line);
 
@@ -20,4 +21,5 @@ class SerialSimulator {
         ButtonEvent getButtonA() const;
         ButtonEvent getButtonB() const;
         bool getHeartRate(uint16_t& hr) const;
+        bool getDumpRequest() const;
 };

@@ -5,6 +5,7 @@
 void SerialSimulator::update() {
     simulatedBtnA = ButtonEvent::NONE;
     simulatedBtnB = ButtonEvent::NONE;
+    dumpRequested = false;
     while (Serial.available() > 0) {
         char c = Serial.read();
         if (c == '\n') {
@@ -29,6 +30,9 @@ bool SerialSimulator::processLine(const char* line) {
     } else if (strncmp(line, "BTN,B_LONG", 10) == 0) {
         simulatedBtnB = ButtonEvent::LONG_PRESS;
         return true;
+    } else if (strcmp(line, "DUMP") == 0) {
+        dumpRequested = true;
+        return true;
     } else if (strncmp(line, "HR,", 3) == 0) {
         const char* hrStr = line + 3;
         char* endPtr;
@@ -45,6 +49,9 @@ ButtonEvent SerialSimulator::getButtonA() const {
 }
 ButtonEvent SerialSimulator::getButtonB() const {
     return simulatedBtnB;
+}
+bool SerialSimulator::getDumpRequest() const {
+    return dumpRequested;
 }
 bool SerialSimulator::getHeartRate(uint16_t& hr) const {
     if (simulatedHr > 0) {

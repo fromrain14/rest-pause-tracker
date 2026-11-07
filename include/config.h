@@ -8,7 +8,7 @@ constexpr uint8_t SCREEN_HEIGHT = 64;
 constexpr uint8_t SCREEN_I2C_ADDRESS = 0x3C;
 
 //Pin
-constexpr uint8_t LED_PIN = 1;
+constexpr uint8_t LED_PIN = 10;   // D10 = GPIO 10 (cislo v kodu je vzdy GPIO, ne popisek Dx)
 constexpr uint8_t BUTTON_PIN_A = 2;
 constexpr uint8_t BUTTON_PIN_B = 3;
 constexpr uint8_t SDA_PIN = 6;
@@ -39,6 +39,9 @@ constexpr uint8_t HR_PEAK_LOOKBACK_SAMPLES = 60;
 constexpr float HR_READY_RATIO = 0.90f;
 constexpr float HR_PLATEAU_SLOPE = 0.05f;
 
+//Logger
+constexpr uint8_t LOG_FLUSH_EVERY_SAMPLES = 30; // flush do flash po 30 vzorcich (= max. 30 s ztracenych dat pri vypadku)
+
 //Serial Simulator
-constexpr bool SIMULATION = true; // true = tep a tlacitka i ze Serial Monitoru (HR,140 / BTN,A / BTN,B_LONG)
+constexpr bool SIMULATION = false; // true = tep a tlacitka i ze Serial Monitoru (HR,140 / BTN,A / BTN,B_LONG)
 constexpr size_t SIM_LINE_SIZE = 32; // max. delka prikazu vcetne '\0' (napr. "BTN,B_LONG")

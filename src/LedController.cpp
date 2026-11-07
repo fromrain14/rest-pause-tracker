@@ -3,7 +3,7 @@
 LedController::LedController(){}
 
 void LedController::begin() {
-    FastLED.addLeds<WS2811, LED_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS); // 5mm WS2811 LED čte barvy v pořadí RGB (pásky WS2812B mají GRB)
     FastLED.setBrightness(LED_BRIGHTNESS);
     FastLED.clear();
     FastLED.show();
