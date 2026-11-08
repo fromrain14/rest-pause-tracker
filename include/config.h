@@ -8,7 +8,7 @@ constexpr uint8_t SCREEN_HEIGHT = 64;
 constexpr uint8_t SCREEN_I2C_ADDRESS = 0x3C;
 
 //Pin
-constexpr uint8_t LED_PIN = 10;   // D10 = GPIO 10 (cislo v kodu je vzdy GPIO, ne popisek Dx)
+constexpr uint8_t LED_PIN = 5;    // D3 = GPIO 5 (D10 je na teto desce poskozeny). Cislo v kodu je vzdy GPIO, ne popisek Dx
 constexpr uint8_t BUTTON_PIN_A = 2;
 constexpr uint8_t BUTTON_PIN_B = 3;
 constexpr uint8_t SDA_PIN = 6;
