@@ -10,13 +10,13 @@ class DisplayUI {
 
         bool begin();
 
-        void draw(const StateMachine& fsm, uint32_t now);
+        void draw(const StateMachine& fsm, uint32_t now, uint8_t batteryPercent);
 
     private:
         Adafruit_SH1106G display;
         uint32_t lastDrawTime = 0;
 
-        void drawSetup(const StateMachine& fsm);
+        void drawSetup(const StateMachine& fsm, uint8_t batteryPercent);
         void drawRestRed(const StateMachine& fsm, uint32_t now);
         void drawRestOrange(const StateMachine& fsm, uint32_t now);
         void drawRestBody(const StateMachine& fsm, uint32_t now);

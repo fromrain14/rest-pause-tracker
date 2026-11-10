@@ -12,6 +12,7 @@
 #include "RecoveryAlgorithm.h"
 #include "SerialSimulator.h"
 #include "Logger.h"
+#include "BatteryMonitor.h"
 
 Button btnA(BUTTON_PIN_A, INPUT_PULLUP);
 Button btnB(BUTTON_PIN_B, INPUT_PULLUP);
@@ -33,6 +34,8 @@ SerialSimulator sim;
 Logger logger;
 uint32_t logStartMs = 0; // čas startu tréninku pro sloupec t v logu
 
+BatteryMonitor battery;
+
 void setup() {
     btnA.begin();
     btnB.begin();
@@ -53,6 +56,7 @@ void setup() {
     if (!logger.begin()) {
         Serial.println("Logger initialization failed");
     }
+    battery.begin();
 }
 
 void loop() {   
@@ -89,7 +93,7 @@ void loop() {
     // Výsledek algoritmu, počítá se 1× za sekundu po novém vzorku (viz níže)
     static bool hrReady = false;
     fsm.update(btnAEvent, btnBEvent, hrReady, now);
-    displayUI.draw(fsm, now);
+    displayUI.draw(fsm, now, battery.getPercent());
     ledController.updateLEDs(fsm);
     if (currentState != fsm.getState()) {
         Serial.print("State changed to: ");
@@ -149,6 +153,18 @@ void loop() {
         hrReady = recovery.isHrReady(hrBuffer);
         // Mimo trénink je soubor zavřený → logSample nic nezapíše
         logger.logSample((now - logStartMs) / 1000, heartRate, fsm.getState(), hrReady);
+    }
+
+    battery.update(now);
+    // Ladicí výpis baterie 1× za interval měření (bez zapojeného děliče ukazuje nesmysly — pin visí ve vzduchu)
+    static uint32_t lastBatteryPrintMs = 0;
+    if (now - lastBatteryPrintMs >= BATTERY_MEASURE_INTERVAL_MS) {
+        lastBatteryPrintMs = now;
+        Serial.print("BAT: ");
+        Serial.print(battery.getMillivolts());
+        Serial.print(" mV, ");
+        Serial.print(battery.getPercent());
+        Serial.println(" %");
     }
 
 }   

@@ -6,7 +6,7 @@ bool DisplayUI::begin() {
     return display.begin(SCREEN_I2C_ADDRESS, true);
 }
 
-void DisplayUI::draw(const StateMachine& fsm, uint32_t now) {
+void DisplayUI::draw(const StateMachine& fsm, uint32_t now, uint8_t batteryPercent) {
     if (now - lastDrawTime < 200) {
         return;
     }
@@ -21,7 +21,7 @@ void DisplayUI::draw(const StateMachine& fsm, uint32_t now) {
         display.setTextColor(SH110X_WHITE);
         switch (fsm.getState()) {
             case State::SETUP:
-                drawSetup(fsm);
+                drawSetup(fsm, batteryPercent);
                 break;
             case State::READY:
                 drawReady(fsm);
@@ -41,10 +41,16 @@ void DisplayUI::draw(const StateMachine& fsm, uint32_t now) {
     }
 }
 
-void DisplayUI::drawSetup(const StateMachine& fsm) {
+void DisplayUI::drawSetup(const StateMachine& fsm, uint8_t batteryPercent) {
     display.setTextSize(1);
     display.setCursor(0, 0);
     display.print("MIN PAUZA");
+
+    // Baterie vpravo nahoře, zarovnaná k pravému okraji (znak velikosti 1 = 6 px)
+    uint8_t chars = (batteryPercent >= 100) ? 4 : (batteryPercent >= 10) ? 3 : 2; // číslice + '%'
+    display.setCursor(SCREEN_WIDTH - chars * 6, 0);
+    display.print(batteryPercent);
+    display.print('%');
 
     display.setTextSize(3);
     display.setCursor(28, 20);

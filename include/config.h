@@ -42,6 +42,12 @@ constexpr float HR_PLATEAU_SLOPE = 0.05f;
 //Logger
 constexpr uint8_t LOG_FLUSH_EVERY_SAMPLES = 30; // flush do flash po 30 vzorcich (= max. 30 s ztracenych dat pri vypadku)
 
+//Battery
+constexpr uint8_t BATTERY_PIN = 4;                   // D2 = GPIO 4, dělič 2× 220k z BAT+
+constexpr uint32_t BATTERY_MEASURE_INTERVAL_MS = 10000; // napětí se mění pomalu → měřit 1× za 10 s
+constexpr uint8_t BATTERY_SAMPLES = 16;              // počet čtení ADC na jedno měření (průměr proti šumu)
+constexpr uint8_t BATTERY_DIVIDER_RATIO = 2;         // 2 stejné rezistory → na pinu je polovina napětí baterie
+
 //Serial Simulator
 constexpr bool SIMULATION = false; // true = tep a tlacitka i ze Serial Monitoru (HR,140 / BTN,A / BTN,B_LONG)
 constexpr size_t SIM_LINE_SIZE = 32; // max. delka prikazu vcetne '\0' (napr. "BTN,B_LONG")
