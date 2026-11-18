@@ -5,11 +5,11 @@
 
 class Logger {
 public:
-    bool begin();         // připojí LittleFS , otevře NVS
-    void startWorkout();  // číslo tréninku +1 do NVS, otevře nový soubor, zapíše hlavičku
+    bool begin();         // mounts LittleFS, opens NVS
+    void startWorkout();  // increments workout number in NVS, opens a new file, writes the CSV header
     void logSample(uint32_t tS, uint16_t hr, State state, bool ready);  
     void endWorkout();    // flush + close
-    void dumpLastWorkout(); // pro debug: vypíše poslední trénink na Serial
+    void dumpLastWorkout(); // debug: prints the last workout to Serial
 
 
 private:

@@ -46,8 +46,8 @@ void DisplayUI::drawSetup(const StateMachine& fsm, uint8_t batteryPercent) {
     display.setCursor(0, 0);
     display.print("MIN PAUZA");
 
-    // Baterie vpravo nahoře, zarovnaná k pravému okraji (znak velikosti 1 = 6 px)
-    uint8_t chars = (batteryPercent >= 100) ? 4 : (batteryPercent >= 10) ? 3 : 2; // číslice + '%'
+    // Battery in the top-right corner, right-aligned (text size 1 char = 6 px)
+    uint8_t chars = (batteryPercent >= 100) ? 4 : (batteryPercent >= 10) ? 3 : 2; // digits + '%'
     display.setCursor(SCREEN_WIDTH - chars * 6, 0);
     display.print(batteryPercent);
     display.print('%');
@@ -81,7 +81,7 @@ void DisplayUI::drawRestOrange(const StateMachine& fsm, uint32_t now) {
     drawRestBody(fsm, now);
 }
 
-// Společná část obou obrazovek pauzy: velký uplynulý čas + spodní řádek
+// Shared part of both rest screens: large elapsed time + bottom line
 void DisplayUI::drawRestBody(const StateMachine& fsm, uint32_t now) {
     display.setTextSize(4);
     display.setCursor(16, 18);
@@ -94,7 +94,7 @@ void DisplayUI::drawRestBody(const StateMachine& fsm, uint32_t now) {
     display.print("  HOLD A=SKIP");
 }
 
-// Pozadí invertuje draw() přes display.invertDisplay(true)
+// Background is inverted by draw() via display.invertDisplay(true)
 void DisplayUI::drawReady(const StateMachine& fsm) {
     display.setTextSize(4);
     display.setCursor(28, 16);
@@ -134,7 +134,7 @@ void DisplayUI::drawSummary(const StateMachine& fsm) {
     display.print("STISK = NOVY TRENINK");
 }
 
-// Vypíše ms jako m:ss na aktuální pozici kurzoru (90000 → "1:30")
+// Prints ms as m:ss at the current cursor position (90000 -> "1:30")
 void DisplayUI::printTime(uint32_t ms) {
     uint32_t totalSeconds = ms / 1000;
     uint32_t minutes = totalSeconds / 60;

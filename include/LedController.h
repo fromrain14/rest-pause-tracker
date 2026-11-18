@@ -4,7 +4,7 @@
 #include "StateMachine.h"
 #include <FastLED.h>
 
-//o nicem nerozhoduje, jen signalizuje stav, vola ji main.cpp, aby se rozsvitila LED podle stavu statemachine
+// Makes no decisions, only shows the current StateMachine state on the LED (called from main.cpp)
 class LedController {
     private:
         CRGB leds[NUM_LEDS];

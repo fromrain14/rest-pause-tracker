@@ -32,7 +32,7 @@ RecoveryAlgorithm recovery;
 SerialSimulator sim;
 
 Logger logger;
-uint32_t logStartMs = 0; // čas startu tréninku pro sloupec t v logu
+uint32_t logStartMs = 0; // workout start time for the t column in the log
 
 BatteryMonitor battery;
 
@@ -40,11 +40,11 @@ void setup() {
     btnA.begin();
     btnB.begin();
     Serial.begin(115200);
-    // USB Serial na C3: po resetu chvíli trvá, než se monitor znovu připojí → počkat max. 3 s
+    // USB Serial on C3: the monitor takes a while to reconnect after reset -> wait up to 3 s
     while (!Serial && millis() < 3000) {
         delay(10);
     }
-    Serial.println("Build: " __DATE__ " " __TIME__); // ověření, že na desce běží poslední nahraný firmware
+    Serial.println("Build: " __DATE__ " " __TIME__); // confirms the board runs the latest uploaded firmware
     Wire.begin(SDA_PIN, SCL_PIN);
     if (!displayUI.begin()) {
         Serial.println("Display initialization failed");
@@ -64,12 +64,12 @@ void loop() {
     State currentState = fsm.getState();
     ButtonEvent btnAEvent = btnA.update();
     ButtonEvent btnBEvent = btnB.update();
-    // Příkazy ze Serialu se čtou vždy (DUMP funguje i s pásem)
+    // Serial commands are always read (DUMP works with the real strap too)
     sim.update();
     if (sim.getDumpRequest()) {
         logger.dumpLastWorkout();
     }
-    // Simulace: příkaz ze Serialu přebije fyzické tlačítko (fyzická tlačítka fungují dál)
+    // Simulation: a Serial command overrides the physical button (physical buttons still work)
     if (SIMULATION) {
         if (sim.getButtonA() != ButtonEvent::NONE) {
             btnAEvent = sim.getButtonA();
@@ -90,7 +90,7 @@ void loop() {
     }
 
     
-    // Výsledek algoritmu, počítá se 1× za sekundu po novém vzorku (viz níže)
+    // Algorithm result, recomputed once per second after a new sample (see below)
     static bool hrReady = false;
     fsm.update(btnAEvent, btnBEvent, hrReady, now);
     displayUI.draw(fsm, now, battery.getPercent());
@@ -98,12 +98,12 @@ void loop() {
     if (currentState != fsm.getState()) {
         Serial.print("State changed to: ");
         Serial.println(fsm.printState(fsm.getState()));
-        // Vstup do pauzy (jen z READY po stisku A) → algoritmus počítá od nuly
+        // Entering rest (only from READY after pressing A) -> algorithm starts from zero
         if (fsm.getState() == State::REST_RED) {
             recovery.startRest();
             hrReady = false;
         }
-        // Start tréninku → nový log soubor; konec tréninku → zavřít log
+        // Workout start -> new log file; workout end -> close log
         if (currentState == State::SETUP && fsm.getState() == State::READY) {
             logger.startWorkout();
             logStartMs = now;
@@ -115,20 +115,20 @@ void loop() {
         }
     }
 
-    // Dlouhé B v SETUP → zapomenout uložený pás (FSM na dlouhé B v SETUP nereaguje)
+    // Long B in SETUP -> forget the saved strap (the FSM ignores long B in SETUP)
     if (currentState == State::SETUP && btnBEvent == ButtonEvent::LONG_PRESS) {
         ble.removeSavedAddress();
         Serial.println("Saved strap address removed");
     }
 
     ble.update();
-    // Ladicí výpis připojení / odpojení pásu
+    // Debug print of strap connect / disconnect
     static bool wasConnected = false;
     if (ble.isConnected() != wasConnected) {
         wasConnected = ble.isConnected();
         Serial.println(wasConnected ? "BLE: strap connected" : "BLE: strap disconnected");
     }
-    // Vzorek tepu do bufferu 1× za sekundu (0 = bez dat, aby seděla časová osa) + ladicí výpis
+    // Push one HR sample per second (0 = no data, keeps the time axis aligned) + debug print
     static uint32_t lastHrSampleMs = 0;
     if (now - lastHrSampleMs >= 1000) {
         lastHrSampleMs = now;
@@ -138,7 +138,7 @@ void loop() {
             heartRate = 0;
         }
         hrBuffer.push(heartRate);
-        // Ladicí výpis jen při změně tepu, ať Serial Monitor neroluje a dá se psát
+        // Print only on HR change so the Serial Monitor does not scroll and stays usable for input
         static uint16_t lastPrintedHr = UINT16_MAX;
         if (heartRate != lastPrintedHr) {
             lastPrintedHr = heartRate;
@@ -151,12 +151,12 @@ void loop() {
         }
         recovery.onSample();
         hrReady = recovery.isHrReady(hrBuffer);
-        // Mimo trénink je soubor zavřený → logSample nic nezapíše
+        // Outside a workout the file is closed -> logSample writes nothing
         logger.logSample((now - logStartMs) / 1000, heartRate, fsm.getState(), hrReady);
     }
 
     battery.update(now);
-    // Ladicí výpis baterie 1× za interval měření (bez zapojeného děliče ukazuje nesmysly — pin visí ve vzduchu)
+    // Battery debug print once per measurement interval (shows garbage without the divider - pin is floating)
     static uint32_t lastBatteryPrintMs = 0;
     if (now - lastBatteryPrintMs >= BATTERY_MEASURE_INTERVAL_MS) {
         lastBatteryPrintMs = now;

@@ -1,12 +1,12 @@
 #include "BatteryMonitor.h"
 
-// Jeden bod vybíjecí křivky LiPol: napětí baterie → zbývající %
+// One point of the LiPo discharge curve: battery voltage -> remaining %
 struct BatteryPoint {
     uint16_t millivolts;
     uint8_t percent;
 };
 
-// Body seřazené od nejvyššího napětí; přibližné hodnoty z typických křivek LiPol
+// Sorted from highest voltage; approximate values from typical LiPo curves
 constexpr BatteryPoint BATTERY_CURVE[] = {
     {4200, 100},
     {4060,  90},
@@ -49,7 +49,7 @@ uint16_t BatteryMonitor::getMillivolts() const {
 }
 
 uint8_t BatteryMonitor::getPercent() const {
-    // Mimo tabulku: plná / prázdná
+    // Outside the table: full / empty
     if (millivolts >= BATTERY_CURVE[0].millivolts) {
         return 100;
     }
@@ -61,7 +61,7 @@ uint8_t BatteryMonitor::getPercent() const {
         const BatteryPoint& high = BATTERY_CURVE[i];
         const BatteryPoint& low = BATTERY_CURVE[i + 1];
         if (millivolts >= low.millivolts) {
-            // Lineární interpolace: kolik mV nad low → úměrně kolik % nad low
+            // Linear interpolation between the two neighbouring points
             return low.percent + (millivolts - low.millivolts) * (high.percent - low.percent)
                                  / (high.millivolts - low.millivolts);
         }

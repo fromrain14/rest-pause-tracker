@@ -5,7 +5,7 @@
 
 enum class State {SETUP, READY, REST_RED, REST_ORANGE, SUMMARY};
 
-// Rozhoduje, v jaké fázi tréninku jsem, a vede si statistiku tréninku.
+// Decides which phase of the workout we are in and keeps workout statistics.
 class StateMachine {
 public:
     void update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t now);
@@ -30,12 +30,12 @@ private:
     uint32_t minPauseMs = MIN_REST_TIME_MS;
 
     uint32_t workoutStartMs = 0;
-    uint32_t workoutDurationMs = 0;   // uloží se jednou při přechodu do SUMMARY
+    uint32_t workoutDurationMs = 0;   // stored once on transition to SUMMARY
 
-    uint32_t lastAPressMs = 0;        // konec poslední série = začátek aktuální pauzy
-    bool wasAPress = false;           // platí lastAPressMs?
+    uint32_t lastAPressMs = 0;        // end of the last set = start of the current rest
+    bool wasAPress = false;           // is lastAPressMs valid?
 
     uint8_t setCount = 0;
-    uint32_t restSumMs = 0;           // součet dokončených pauz
-    uint8_t restCount = 0;            // počet dokončených pauz
+    uint32_t restSumMs = 0;           // sum of completed rests
+    uint8_t restCount = 0;            // number of completed rests
 };

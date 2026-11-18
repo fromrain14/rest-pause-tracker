@@ -42,7 +42,7 @@ bool SerialSimulator::processLine(const char* line) {
             return true;
         }
     }
-    return false; // Neplatný příkaz
+    return false; // Invalid command
 }
 ButtonEvent SerialSimulator::getButtonA() const {
     return simulatedBtnA;

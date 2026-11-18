@@ -3,7 +3,7 @@
 LedController::LedController(){}
 
 void LedController::begin() {
-    FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS); // 5mm WS2811 LED čte barvy v pořadí RGB (pásky WS2812B mají GRB)
+    FastLED.addLeds<WS2811, LED_PIN, RGB>(leds, NUM_LEDS); // 5 mm WS2811 LED uses RGB order (WS2812B strips use GRB)
     FastLED.setBrightness(LED_BRIGHTNESS);
     FastLED.clear();
     FastLED.show();
@@ -20,13 +20,13 @@ void LedController::updateLEDs(const StateMachine& fsm) {
         leds[0] = CRGB::Blue;
         break;
         case State::READY:
-        leds[0] = CRGB(0, 255, 0);    // CRGB::Green má jen 128
+        leds[0] = CRGB(0, 255, 0);    
         break;
         case State::REST_RED:
         leds[0] = CRGB::Red;
         break;
         case State::REST_ORANGE:
-        leds[0] = CRGB(255, 60, 0);   // CRGB::Orange (255,165,0) svítí na LED žlutě
+        leds[0] = CRGB(255, 60, 0);   
         break;
         case State::SUMMARY:
         leds[0] = CRGB::Purple;

@@ -3,8 +3,8 @@
 void StateMachine::update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t now) {
     switch (state) {
         case State::SETUP:
-            // A krátký → READY / akce (1)
-            // B krátký → zůstat / akce (2)
+            // A short -> READY (start workout)
+            // B short -> +15 s minimum rest
             if (a == ButtonEvent::SHORT_PRESS) {
                 state = State::READY;
                 workoutStartMs = now;
@@ -58,9 +58,9 @@ void StateMachine::update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t n
             break;
 
         case State::REST_ORANGE:
-            // A dlouhý → READY
-            // B dlouhý → SUMMARY / akce (4)
-            // čas OK → READY
+            // A long -> READY (skip rest)
+            // B long -> SUMMARY
+            // HR ready and min. rest elapsed -> READY
             if (a == ButtonEvent::LONG_PRESS) {
                 state = State::READY;
             }
@@ -74,7 +74,7 @@ void StateMachine::update(ButtonEvent a, ButtonEvent b, bool hrReady, uint32_t n
             break;
 
         case State::SUMMARY:
-            // libovolné tlačítko → SETUP
+            // any button -> SETUP
             if (a != ButtonEvent::NONE || b != ButtonEvent::NONE) {
                 state = State::SETUP;
                 wasAPress = false;
