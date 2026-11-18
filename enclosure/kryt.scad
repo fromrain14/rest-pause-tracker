@@ -72,7 +72,7 @@ deska_od_vika = 23;                          // vnitrni strana vika -> predni st
 deska_z = vnitr_d - deska_od_vika - deska_t; // spodni strana desky (= vyska lyzin)
 lyzina_w = 3;                                // lyziny podel leve a prave steny, deska na nich lezi
 
-lista_h  = 8.5;   // dutinkova lista
+lista_h  = 11.0;  // od desky po spodek XIAO: dutinkova lista 8.5 + plast kolicku XIAO 2.5 (zmereno 2026-11-15)
 xiao_w = 21;  xiao_h = 17.8;  xiao_t = 1.2;
 usb_w = 9;   usb_t = 3.2;  usb_presah = 1.0;
 xiao_x = deska_x + deska_w - xiao_w;          // USB-C na pravem okraji desky
